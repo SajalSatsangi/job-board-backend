@@ -7,16 +7,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// PostgreSQL connection using environment variables
+// PostgreSQL connection using DATABASE_URL directly
 const pool = new Pool({
-  user: process.env.PGUSER,
-  password: process.env.PGPASSWORD,
-  database: process.env.PGDATABASE,
-  host: process.env.PGHOST,
-  port: parseInt(process.env.PGPORT, 10),
-  ssl: process.env.PGHOST.includes("railway")
-    ? false
-    : { rejectUnauthorized: false },
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.DATABASE_URL.includes("railway")
+    ? false // No SSL needed inside Railway internal network
+    : { rejectUnauthorized: false }, // Needed when external (e.g., Render)
 });
 
 app.get("/", (req, res) => {
